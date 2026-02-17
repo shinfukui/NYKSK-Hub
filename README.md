@@ -1,6 +1,6 @@
 # NYKSK-Hub
 Hub for KSK Members
-index.html](https://github.com/user-attachments/files/25372849/kendo-dojo-hub.2.html)
+[index.2.html](https://github.com/user-attachments/files/25372982/kendo-dojo-hub.2.html)
 <!DOCTYPE html>
 <html lang="en">
 <head>
