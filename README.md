@@ -1,9 +1,7 @@
 # New York Kenshinkai Hub
    
-   Event calendar and schedule for New York Kenshinkai dojo members.
-   
-   [Access the Hub →](https://YOUR-USERNAME.github.io/nykenshinkai-hub/)
-<!DOCTYPE html>
+   Event calendar and schedule for New York Kenshinkai dojo members
+  
 <html lang="en">
 <head>
 <meta charset="UTF-8">
