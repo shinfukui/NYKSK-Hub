@@ -166,7 +166,7 @@
   /* TWO-COLUMN LAYOUT */
   .main-content-wrapper {
     display: grid;
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 3fr 1fr;
     gap: 24px;
     align-items: start;
   }
@@ -520,8 +520,11 @@
   .event-card.list-mode .card-footer { flex-shrink: 0; }
 
   /* TYPE COLORS */
-  .type-class { color: #2d6a4f; background: #d8f3dc; }
-  .stripe-class { background: #2d6a4f; }
+  .type-manhattan { color: #2d6a4f; background: #d8f3dc; }
+  .stripe-manhattan { background: #2d6a4f; }
+
+  .type-njkids { color: #c87a07; background: #fef5e7; }
+  .stripe-njkids { background: #f39c12; }
 
   .type-tournament { color: #922b21; background: #fadbd8; }
   .stripe-tournament { background: #922b21; }
@@ -531,6 +534,9 @@
 
   .type-joint { color: #7d6608; background: #fef9e7; }
   .stripe-joint { background: #c9a84c; }
+
+  .type-exam { color: #4a235a; background: #e8daef; }
+  .stripe-exam { background: #8e44ad; }
 
   .type-other { color: #4a235a; background: #e8daef; }
   .stripe-other { background: #7d3c98; }
@@ -1588,10 +1594,12 @@
     </div>
     <div class="filter-tabs" id="filterTabs">
       <button class="filter-tab active" data-type="all" onclick="setFilter('all', this)">All</button>
-      <button class="filter-tab" data-type="class" onclick="setFilter('class', this)"><span class="tab-dot" style="background:#2d6a4f"></span>Class</button>
+      <button class="filter-tab" data-type="manhattan" onclick="setFilter('manhattan', this)"><span class="tab-dot" style="background:#2d6a4f"></span>Manhattan</button>
+      <button class="filter-tab" data-type="njkids" onclick="setFilter('njkids', this)"><span class="tab-dot" style="background:#f39c12"></span>NJ Kids</button>
       <button class="filter-tab" data-type="tournament" onclick="setFilter('tournament', this)"><span class="tab-dot" style="background:#922b21"></span>Tournament</button>
       <button class="filter-tab" data-type="seminar" onclick="setFilter('seminar', this)"><span class="tab-dot" style="background:#1a5276"></span>Seminar</button>
-      <button class="filter-tab" data-type="joint" onclick="setFilter('joint', this)"><span class="tab-dot" style="background:#c9a84c"></span>Joint Practice</button>
+      <button class="filter-tab" data-type="joint" onclick="setFilter('joint', this)"><span class="tab-dot" style="background:#c9a84c"></span>Joint</button>
+      <button class="filter-tab" data-type="exam" onclick="setFilter('exam', this)"><span class="tab-dot" style="background:#8e44ad"></span>Exam</button>
       <button class="filter-tab" data-type="other" onclick="setFilter('other', this)"><span class="tab-dot" style="background:#7d3c98"></span>Other</button>
     </div>
     <div class="view-toggle">
@@ -1667,10 +1675,12 @@
         <div class="form-group">
           <label>Type</label>
           <select id="fType">
-            <option value="class">Regular Class</option>
+            <option value="manhattan">Manhattan Practice</option>
+            <option value="njkids">NJ Kids Class</option>
             <option value="tournament">Tournament</option>
             <option value="seminar">Seminar</option>
             <option value="joint">Joint Practice</option>
+            <option value="exam">Exam</option>
             <option value="other">Other</option>
           </select>
         </div>
@@ -1859,13 +1869,15 @@ let membersPanelOpen = false;
 
 const ROLES = { admin:'Admin', trusted:'Editor', member:'Member' };
 const TYPE_META = {
-  class:      { label:'Regular Class',  css:'class',      icon:'⚔️' },
-  tournament: { label:'Tournament',      css:'tournament', icon:'🏆' },
-  seminar:    { label:'Seminar',         css:'seminar',    icon:'📖' },
-  joint:      { label:'Joint Practice',  css:'joint',      icon:'🤝' },
-  other:      { label:'Other',           css:'other',      icon:'📌' },
+  manhattan:  { label:'Manhattan Practice', css:'manhattan',  icon:'🗽' },
+  njkids:     { label:'NJ Kids Class',      css:'njkids',     icon:'👶' },
+  tournament: { label:'Tournament',         css:'tournament', icon:'🏆' },
+  seminar:    { label:'Seminar',            css:'seminar',    icon:'📖' },
+  joint:      { label:'Joint Practice',     css:'joint',      icon:'🤝' },
+  exam:       { label:'Exam',               css:'exam',       icon:'📝' },
+  other:      { label:'Other',              css:'other',      icon:'📌' },
 };
-const TYPE_COLORS = { class:'#2d6a4f', tournament:'#922b21', seminar:'#1a5276', joint:'#b8860b', other:'#7d3c98' };
+const TYPE_COLORS = { manhattan:'#2d6a4f', njkids:'#f39c12', tournament:'#922b21', seminar:'#1a5276', joint:'#b8860b', exam:'#8e44ad', other:'#7d3c98' };
 const AV_COLORS = ['av1','av2','av3','av4','av5','av6'];
 function avColor(i) { return AV_COLORS[i % AV_COLORS.length]; }
 function initials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
@@ -2093,12 +2105,12 @@ function futureDateStr(days) {
 }
 
 let events = [
-  { id:1, title:'Tuesday Evening Class', type:'class', date:futureDateStr(3), time:'19:00', timeEnd:'21:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'Regular keiko. Beginners welcome. Please arrive 10 min early to prepare bogu.', docs:[], participants:['KT','RS','MA','YB','TN'], participantNames:['Kenji Tanaka','Robert Smith','Maria Anderson','Yuki Brown','Tom Nakamura'], registeredByMe:true, postedBy:'Admin' },
+  { id:1, title:'Tuesday Evening Class', type:'manhattan', date:futureDateStr(3), time:'19:00', timeEnd:'21:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'Regular keiko. Beginners welcome. Please arrive 10 min early to prepare bogu.', docs:[], participants:['KT','RS','MA','YB','TN'], participantNames:['Kenji Tanaka','Robert Smith','Maria Anderson','Yuki Brown','Tom Nakamura'], registeredByMe:true, postedBy:'Admin' },
   { id:2, title:'Spring Shiai — Regional Tournament', type:'tournament', date:futureDateStr(18), time:'09:00', timeEnd:'17:00', venue:'Prefectural Gymnasium, 2 Oak St', cost:'¥3,000 / member', regDeadline:futureDateStr(10), notes:'Individual and team shiai. Bring valid ZNKR membership card. Men and bogu mandatory.', docs:[{name:'Entry Form',url:'https://drive.google.com',type:'link'},{name:'Schedule',url:'',type:'file'}], participants:['KT','RS','MA'], participantNames:['Kenji Tanaka','Robert Smith','Maria Anderson'], registeredByMe:false, postedBy:'Admin' },
-  { id:3, title:'Seminar with Nakamura Sensei (7-dan)', type:'seminar', date:futureDateStr(26), time:'10:00', timeEnd:'15:00', venue:'East Community Hall, Room B', cost:'$40 per person', regDeadline:futureDateStr(20), notes:'Focus on kamae and suburi fundamentals. Open to all grades. Max 30 participants.', docs:[{name:'Seminar Flyer',url:'https://docs.google.com',type:'link'}], participants:['KT','YB','TN','MA','RS'], participantNames:['Kenji Tanaka','Yuki Brown','Tom Nakamura','Maria Anderson','Robert Smith'], registeredByMe:true, postedBy:'Trusted Member' },
+  { id:3, title:'Seminar with Nakamura Sensei (7-dan)', type:'seminar', date:futureDateStr(26), time:'10:00', timeEnd:'15:00', venue:'East Community Hall, Room B', cost:'$40 per person', regDeadline:futureDateStr(20), notes:'Focus on kamae and suburi fundamentals. Open to all grades. Max 30 participants.', docs:[{name:'Seminar Flyer',url:'https://docs.google.com',type:'link'}], participants:['KT','YB','TN','MA','RS'], participantNames:['Kenji Tanaka','Yuki Brown','Tom Nakamura','Maria Anderson','Robert Smith'], registeredByMe:true, postedBy:'Editor' },
   { id:4, title:'Joint Practice — Riverside Dojo', type:'joint', date:futureDateStr(7), time:'14:00', timeEnd:'16:30', venue:'Riverside Kendo Club, 88 River Rd', cost:'Free', regDeadline:futureDateStr(5), notes:'Friendly joint keiko. Jigeiko format. Carpooling available — contact admin.', docs:[], participants:['KT','RS','TN'], participantNames:['Kenji Tanaka','Robert Smith','Tom Nakamura'], registeredByMe:false, postedBy:'Admin' },
-  { id:5, title:'Saturday Morning Class', type:'class', date:futureDateStr(5), time:'09:00', timeEnd:'11:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'All levels. Focus on kihon waza this session.', docs:[], participants:['KT','MA','YB'], participantNames:['Kenji Tanaka','Maria Anderson','Yuki Brown'], registeredByMe:true, postedBy:'Admin' },
-  { id:6, title:'Grading Assessment (Ikkyu & Shodan)', type:'other', date:futureDateStr(35), time:'13:00', timeEnd:'16:00', venue:'Main Dojo — 45 Sakura Ave', cost:'$50 examination fee', regDeadline:futureDateStr(28), notes:'ZNKR grading for Ikkyu and Shodan candidates. Sensei approval required.', docs:[{name:'Grading Requirements',url:'https://drive.google.com',type:'link'},{name:'Application Form',url:'',type:'file'}], participants:['MA','TN'], participantNames:['Maria Anderson','Tom Nakamura'], registeredByMe:false, postedBy:'Admin' },
+  { id:5, title:'Saturday Morning Class', type:'njkids', date:futureDateStr(5), time:'09:00', timeEnd:'11:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'All levels. Focus on kihon waza this session.', docs:[], participants:['KT','MA','YB'], participantNames:['Kenji Tanaka','Maria Anderson','Yuki Brown'], registeredByMe:true, postedBy:'Admin' },
+  { id:6, title:'Grading Assessment (Ikkyu & Shodan)', type:'exam', date:futureDateStr(35), time:'13:00', timeEnd:'16:00', venue:'Main Dojo — 45 Sakura Ave', cost:'$50 examination fee', regDeadline:futureDateStr(28), notes:'ZNKR grading for Ikkyu and Shodan candidates. Sensei approval required.', docs:[{name:'Grading Requirements',url:'https://drive.google.com',type:'link'},{name:'Application Form',url:'',type:'file'}], participants:['MA','TN'], participantNames:['Maria Anderson','Tom Nakamura'], registeredByMe:false, postedBy:'Admin' },
 ];
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
@@ -2288,7 +2300,8 @@ function viewAttendees(id) {
   const e = events.find(ev => ev.id === id);
   if (!e) return;
   
-  const names = e.participantNames || [];
+  // Fallback if participantNames doesn't exist (old events)
+  const names = e.participantNames || e.participants || [];
   if (!names.length) {
     alert('No one has registered yet.');
     return;
