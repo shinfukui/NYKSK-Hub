@@ -1,11 +1,10 @@
-# New York Kenshinkai Hub
-   
-   Event calendar and schedule for New York Kenshinkai dojo members
-  
+[kendo-dojo-hub (3).html](https://github.com/user-attachments/files/25394218/kendo-dojo-hub.3.html)
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New York Kenshinkai Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -23,6 +22,12 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Hide GitHub Pages default header */
+  body > h1:first-child,
+  body > header:first-child {
+    display: none !important;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
@@ -1038,6 +1043,150 @@
   }
   .doc-pill-file:hover { background: var(--gold); }
 
+  /* ── MESSAGE BOARD ────────────────────────────────────────────────────────── */
+  .message-board {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1.5px solid var(--gray-light);
+    margin-bottom: 24px;
+    overflow: hidden;
+    animation: fadeUp 0.3s ease both;
+  }
+  .message-board-header {
+    background: var(--ink);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .message-board-header h3 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--paper);
+  }
+
+  .message-form {
+    padding: 16px 20px;
+    border-bottom: 1.5px solid var(--gray-light);
+    background: var(--paper);
+  }
+  .message-form textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid var(--gray-light);
+    border-radius: 8px;
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    min-height: 60px;
+    resize: vertical;
+    margin-bottom: 8px;
+  }
+  .message-form textarea:focus { border-color: var(--red); outline: none; }
+  
+  .message-form-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .message-form-actions input {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--gray-light);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+  }
+  .message-form-actions input:focus { border-color: var(--red); outline: none; }
+
+  .messages-list {
+    padding: 8px 0;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .message-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-light);
+    transition: background 0.15s;
+  }
+  .message-item:last-child { border-bottom: none; }
+  .message-item:hover { background: var(--paper); }
+
+  .message-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .message-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .message-author {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .message-time {
+    font-size: 11px;
+    color: var(--gray);
+    margin-left: auto;
+  }
+  .message-text {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .message-link {
+    display: inline-block;
+    font-size: 12px;
+    color: #1a5276;
+    text-decoration: none;
+    padding: 4px 10px;
+    background: #d6eaf8;
+    border-radius: 4px;
+    margin-top: 4px;
+    transition: background 0.15s;
+  }
+  .message-link:hover { background: #aed6f1; }
+  .message-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+  .message-delete {
+    font-size: 11px;
+    color: var(--gray);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: all 0.15s;
+    margin-left: 8px;
+  }
+  .message-delete:hover { background: #fadbd8; color: var(--red); }
+
+  .no-messages {
+    text-align: center;
+    padding: 32px;
+    color: var(--gray);
+    font-size: 13px;
+  }
+
   /* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
   @media (max-width: 640px) {
     .header-inner { padding: 16px 20px 16px 30px; }
@@ -1388,6 +1537,23 @@
     <div class="members-list" id="membersList"></div>
   </div>
 
+  <!-- MESSAGE BOARD -->
+  <div class="message-board" id="messageBoard">
+    <div class="message-board-header">
+      <h3>💬 Message Board</h3>
+      <span style="font-size:11px;color:var(--gold);letter-spacing:0.08em" id="messageCount"></span>
+    </div>
+    <div class="message-form">
+      <textarea id="messageText" placeholder="Share a message, announcement, or question..."></textarea>
+      <div class="message-form-actions">
+        <input type="url" id="messageLink" placeholder="Paste a link (optional)">
+        <input type="url" id="messageImage" placeholder="Paste image URL (optional)">
+        <button class="btn-primary" onclick="postMessage()" style="padding:8px 16px;font-size:12px">Post</button>
+      </div>
+    </div>
+    <div class="messages-list" id="messagesList"></div>
+  </div>
+
   <!-- UPCOMING STRIP -->
   <div class="upcoming-strip" id="upcomingStrip"></div>
 
@@ -1480,6 +1646,20 @@
             <option value="CUSTOM">✏️ Custom (type your own)</option>
           </select>
           <input type="text" id="fVenue" placeholder="Enter custom venue" style="margin-top:8px;display:none">
+        </div>
+        <div class="form-group">
+          <label>Floor (optional)</label>
+          <select id="fFloor">
+            <option value="">— None —</option>
+            <option value="3F">3F</option>
+            <option value="4F">4F</option>
+            <option value="12F">12F</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Custom Floor</label>
+          <input type="text" id="fFloorCustom" placeholder="e.g. B1, 5F" style="display:none">
         </div>
         <div class="form-group">
           <label>Cost / Fee</label>
@@ -1609,6 +1789,7 @@ function tryLogin() {
   updateHeaderForRole();
   renderUpcoming();
   renderEvents();
+  renderMessages();
   showToast('⚔️ Welcome, ' + name + '!');
 }
 document.addEventListener('keydown', function(e) {
@@ -1642,6 +1823,87 @@ function initials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2
 let members = [];
 // First person to use admin passcode (9999) will be auto-registered as admin
 // Then they can add other members through the Members panel
+
+// ─── MESSAGE BOARD ────────────────────────────────────────────────────────
+let messages = [];
+
+function postMessage() {
+  if (!currentUser) return;
+  const text = document.getElementById('messageText').value.trim();
+  const link = document.getElementById('messageLink').value.trim();
+  const imageUrl = document.getElementById('messageImage').value.trim();
+  
+  if (!text && !link && !imageUrl) {
+    showToast('⚠️ Please enter a message, link, or image');
+    return;
+  }
+  
+  messages.unshift({
+    id: Date.now(),
+    author: currentUser.name,
+    text: text,
+    link: link,
+    imageUrl: imageUrl,
+    timestamp: new Date().toISOString(),
+  });
+  
+  document.getElementById('messageText').value = '';
+  document.getElementById('messageLink').value = '';
+  document.getElementById('messageImage').value = '';
+  
+  renderMessages();
+  showToast('✅ Message posted');
+}
+
+function deleteMessage(id) {
+  const msg = messages.find(m => m.id === id);
+  if (!msg) return;
+  
+  // Only author or admin can delete
+  if (msg.author !== currentUser?.name && currentRole !== 'admin') {
+    showToast('⚠️ You can only delete your own messages');
+    return;
+  }
+  
+  if (!confirm('Delete this message?')) return;
+  
+  messages = messages.filter(m => m.id !== id);
+  renderMessages();
+  showToast('✅ Message deleted');
+}
+
+function renderMessages() {
+  document.getElementById('messageCount').textContent = messages.length + ' message' + (messages.length !== 1 ? 's' : '');
+  const list = document.getElementById('messagesList');
+  
+  if (!messages.length) {
+    list.innerHTML = '<div class="no-messages">No messages yet. Be the first to post!</div>';
+    return;
+  }
+  
+  list.innerHTML = messages.map(m => {
+    const time = new Date(m.timestamp);
+    const timeStr = time.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' ' + 
+                    time.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    
+    const canDelete = (m.author === currentUser?.name || currentRole === 'admin');
+    const deleteBtn = canDelete ? `<span class="message-delete" onclick="deleteMessage(${m.id})">✕ Delete</span>` : '';
+    
+    return `
+      <div class="message-item">
+        <div class="message-header">
+          <div class="message-avatar ${avColor(messages.indexOf(m))}">${initials(m.author)}</div>
+          <span class="message-author">${m.author}</span>
+          <span class="message-time">${timeStr}</span>
+          ${deleteBtn}
+        </div>
+        ${m.text ? `<div class="message-text">${m.text}</div>` : ''}
+        ${m.link ? `<a href="${m.link}" target="_blank" rel="noopener" class="message-link">🔗 ${m.link.length > 50 ? m.link.substring(0,50)+'...' : m.link}</a>` : ''}
+        ${m.imageUrl ? `<img src="${m.imageUrl}" class="message-image" alt="Posted image" onclick="window.open('${m.imageUrl}','_blank')">` : ''}
+      </div>
+    `;
+  }).join('');
+}
 
 function updateHeaderForRole() {
   const role = currentUser ? currentUser.role : 'member';
@@ -1945,6 +2207,24 @@ function handleVenueSelect() {
   }
 }
 
+function handleFloorSelect() {
+  const sel = document.getElementById('fFloor');
+  const txt = document.getElementById('fFloorCustom');
+  if (sel.value === 'OTHER') {
+    txt.style.display = '';
+    txt.focus();
+  } else {
+    txt.style.display = 'none';
+    txt.value = '';
+  }
+}
+
+// Add onchange handler for floor dropdown
+document.addEventListener('DOMContentLoaded', function() {
+  const floorSel = document.getElementById('fFloor');
+  if (floorSel) floorSel.onchange = handleFloorSelect;
+});
+
 // ─── MODAL ────────────────────────────────────────────────────────────────
 function openModal(prefill) {
   if(!currentUser) return;
@@ -1976,6 +2256,9 @@ function openModal(prefill) {
   // Handle venue dropdown
   const venueSel = document.getElementById('fVenueSelect');
   const venueTxt = document.getElementById('fVenue');
+  const floorSel = document.getElementById('fFloor');
+  const floorTxt = document.getElementById('fFloorCustom');
+  
   if (prefill?.venue) {
     const presetVenues = ['500 8th Ave, New York, NY 10018','534 Old Bergen Blvd, Palisades Park, NJ 07650'];
     if (presetVenues.includes(prefill.venue)) {
@@ -1991,6 +2274,24 @@ function openModal(prefill) {
     venueSel.value = '';
     venueTxt.style.display = 'none';
     venueTxt.value = '';
+  }
+  
+  // Handle floor dropdown
+  if (prefill?.floor) {
+    const presetFloors = ['3F','4F','12F'];
+    if (presetFloors.includes(prefill.floor)) {
+      floorSel.value = prefill.floor;
+      floorTxt.style.display = 'none';
+      floorTxt.value = '';
+    } else {
+      floorSel.value = 'OTHER';
+      floorTxt.style.display = '';
+      floorTxt.value = prefill.floor;
+    }
+  } else {
+    floorSel.value = '';
+    floorTxt.style.display = 'none';
+    floorTxt.value = '';
   }
   
   document.getElementById('fType').value        = prefill?.type||'class';
@@ -2040,12 +2341,25 @@ function renderDocPreview() {
 function saveEvent() {
   const title=document.getElementById('fTitle').value.trim();
   if(!title){showToast('⚠️ Please enter an event title');return;}
+  
+  // Get floor info
+  const floorSel = document.getElementById('fFloor').value;
+  const floorCustom = document.getElementById('fFloorCustom').value.trim();
+  const floor = floorSel === 'OTHER' ? floorCustom : floorSel;
+  
+  // Combine venue with floor if floor is specified
+  let venue = document.getElementById('fVenue').value.trim();
+  if (floor && venue) {
+    venue = venue + ', ' + floor;
+  }
+  
   const data={
     title, type:document.getElementById('fType').value,
     date:document.getElementById('fDate').value,
     time:document.getElementById('fTime').value,
     timeEnd:document.getElementById('fTimeEnd').value,
-    venue:document.getElementById('fVenue').value.trim(),
+    venue: venue,
+    floor: floor, // Store separately for editing
     cost:document.getElementById('fCost').value.trim(),
     regDeadline:document.getElementById('fRegDeadline').value,
     notes:document.getElementById('fNotes').value.trim(),
