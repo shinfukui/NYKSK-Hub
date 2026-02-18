@@ -1,8 +1,10 @@
+[kendo-dojo-hub (7).html](https://github.com/user-attachments/files/25395331/kendo-dojo-hub.7.html)
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>New York Kenshinkai Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -23,8 +25,15 @@
 
   /* Hide GitHub Pages default header */
   body > h1:first-child,
-  body > header:first-child {
+  body > header:first-child,
+  #header,
+  .page-header,
+  body > h1:first-of-type {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   body {
@@ -1757,19 +1766,50 @@ function tryLogin() {
   // Check if member exists (EXACT match, case-sensitive)
   const existingMember = members.find(m => m.name === name);
   
-  // ADMIN PASSCODE: Auto-register if not exists
+  // ADMIN PASSCODE: Check for similar names to prevent duplicates
   if (role === 'admin') {
     if (!existingMember) {
-      members.push({ name, role: 'admin', joined: new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'}) });
-      showToast('✨ Admin account created for ' + name);
+      // Check for similar names (case-insensitive)
+      const similarNames = members.filter(m => m.name.toLowerCase() === name.toLowerCase());
+      
+      if (similarNames.length > 0) {
+        const similar = similarNames[0];
+        if (confirm(`Found existing member: "${similar.name}"\n\nIs this you?\n\nClick OK to log in as ${similar.name}\nClick Cancel to create new account as ${name}`)) {
+          // Log in as existing member
+          currentUser = { name: similar.name, role: similar.role };
+          currentRole = similar.role;
+        } else {
+          // Create new account with the exact name they typed
+          members.push({ name, role: 'admin', joined: new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'}) });
+          saveData(); // Save to localStorage
+          currentUser = { name, role: 'admin' };
+          currentRole = 'admin';
+          showToast('✨ Admin account created for ' + name);
+        }
+      } else {
+        // No similar names found, create new admin
+        members.push({ name, role: 'admin', joined: new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'}) });
+        saveData(); // Save to localStorage
+        currentUser = { name, role: 'admin' };
+        currentRole = 'admin';
+        showToast('✨ Admin account created for ' + name);
+      }
+    } else {
+      // Exact match exists, log in
+      currentUser = { name, role: existingMember.role };
+      currentRole = existingMember.role;
     }
-    currentUser = { name, role: 'admin' };
-    currentRole = 'admin';
   }
-  // MEMBER/TRUSTED PASSCODE: Must be pre-registered
+  // MEMBER/TRUSTED PASSCODE: Must be pre-registered with EXACT name
   else {
     if (!existingMember) {
-      document.getElementById('loginError').textContent = 'Your name is not registered. Contact the admin.';
+      // Check for similar names and suggest correction
+      const similarNames = members.filter(m => m.name.toLowerCase() === name.toLowerCase());
+      if (similarNames.length > 0) {
+        document.getElementById('loginError').textContent = `Name not found. Did you mean "${similarNames[0].name}"? (case-sensitive)`;
+      } else {
+        document.getElementById('loginError').textContent = 'Your name is not registered. Contact the admin.';
+      }
       pinBuffer = ''; updateDots(); return;
     }
     // Verify their registered role matches the passcode they used
@@ -1825,6 +1865,34 @@ let members = [];
 // ─── MESSAGE BOARD ────────────────────────────────────────────────────────
 let messages = [];
 
+// ─── PERSISTENT STORAGE ───────────────────────────────────────────────────
+function saveData() {
+  try {
+    localStorage.setItem('nyksk_members', JSON.stringify(members));
+    localStorage.setItem('nyksk_events', JSON.stringify(events));
+    localStorage.setItem('nyksk_messages', JSON.stringify(messages));
+  } catch (e) {
+    console.error('Failed to save data:', e);
+  }
+}
+
+function loadData() {
+  try {
+    const savedMembers = localStorage.getItem('nyksk_members');
+    const savedEvents = localStorage.getItem('nyksk_events');
+    const savedMessages = localStorage.getItem('nyksk_messages');
+    
+    if (savedMembers) members = JSON.parse(savedMembers);
+    if (savedEvents) events = JSON.parse(savedEvents);
+    if (savedMessages) messages = JSON.parse(savedMessages);
+  } catch (e) {
+    console.error('Failed to load data:', e);
+  }
+}
+
+// Load saved data on startup
+loadData();
+
 function postMessage() {
   if (!currentUser) return;
   const text = document.getElementById('messageText').value.trim();
@@ -1849,6 +1917,7 @@ function postMessage() {
   document.getElementById('messageLink').value = '';
   document.getElementById('messageImage').value = '';
   
+  saveData(); // Save to localStorage
   renderMessages();
   showToast('✅ Message posted');
 }
@@ -1866,6 +1935,7 @@ function deleteMessage(id) {
   if (!confirm('Delete this message?')) return;
   
   messages = messages.filter(m => m.id !== id);
+  saveData(); // Save to localStorage
   renderMessages();
   showToast('✅ Message deleted');
 }
@@ -1949,6 +2019,7 @@ function renderMembersPanel() {
 
 function setMemberRole(idx, role) {
   members[idx].role = role;
+  saveData(); // Save to localStorage
   renderMembersPanel();
   showToast('✅ ' + members[idx].name + ' is now ' + ROLES[role]);
 }
@@ -1961,6 +2032,7 @@ function removeMember(idx) {
   if (!confirm('Remove ' + members[idx].name + ' from the dojo?')) return;
   const name = members[idx].name;
   members.splice(idx, 1);
+  saveData(); // Save to localStorage
   renderMembersPanel();
   showToast('✅ ' + name + ' removed');
 }
@@ -1994,6 +2066,7 @@ function openAddMemberModal() {
     joined: new Date().toLocaleDateString('en-US', {month:'short', year:'numeric'})
   });
   
+  saveData(); // Save to localStorage
   renderMembersPanel();
   showToast('✅ ' + trimmed + ' added as ' + ROLES[role]);
 }
@@ -2005,12 +2078,12 @@ function futureDateStr(days) {
 }
 
 let events = [
-  { id:1, title:'Tuesday Evening Class', type:'class', date:futureDateStr(3), time:'19:00', timeEnd:'21:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'Regular keiko. Beginners welcome. Please arrive 10 min early to prepare bogu.', docs:[], participants:['KT','RS','MA','YB','TN'], registeredByMe:true, postedBy:'Admin' },
-  { id:2, title:'Spring Shiai — Regional Tournament', type:'tournament', date:futureDateStr(18), time:'09:00', timeEnd:'17:00', venue:'Prefectural Gymnasium, 2 Oak St', cost:'¥3,000 / member', regDeadline:futureDateStr(10), notes:'Individual and team shiai. Bring valid ZNKR membership card. Men and bogu mandatory.', docs:[{name:'Entry Form',url:'https://drive.google.com',type:'link'},{name:'Schedule',url:'',type:'file'}], participants:['KT','RS','MA'], registeredByMe:false, postedBy:'Admin' },
-  { id:3, title:'Seminar with Nakamura Sensei (7-dan)', type:'seminar', date:futureDateStr(26), time:'10:00', timeEnd:'15:00', venue:'East Community Hall, Room B', cost:'$40 per person', regDeadline:futureDateStr(20), notes:'Focus on kamae and suburi fundamentals. Open to all grades. Max 30 participants.', docs:[{name:'Seminar Flyer',url:'https://docs.google.com',type:'link'}], participants:['KT','YB','TN','MA','RS'], registeredByMe:true, postedBy:'Trusted Member' },
-  { id:4, title:'Joint Practice — Riverside Dojo', type:'joint', date:futureDateStr(7), time:'14:00', timeEnd:'16:30', venue:'Riverside Kendo Club, 88 River Rd', cost:'Free', regDeadline:futureDateStr(5), notes:'Friendly joint keiko. Jigeiko format. Carpooling available — contact admin.', docs:[], participants:['KT','RS','TN'], registeredByMe:false, postedBy:'Admin' },
-  { id:5, title:'Saturday Morning Class', type:'class', date:futureDateStr(5), time:'09:00', timeEnd:'11:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'All levels. Focus on kihon waza this session.', docs:[], participants:['KT','MA','YB'], registeredByMe:true, postedBy:'Admin' },
-  { id:6, title:'Grading Assessment (Ikkyu & Shodan)', type:'other', date:futureDateStr(35), time:'13:00', timeEnd:'16:00', venue:'Main Dojo — 45 Sakura Ave', cost:'$50 examination fee', regDeadline:futureDateStr(28), notes:'ZNKR grading for Ikkyu and Shodan candidates. Sensei approval required.', docs:[{name:'Grading Requirements',url:'https://drive.google.com',type:'link'},{name:'Application Form',url:'',type:'file'}], participants:['MA','TN'], registeredByMe:false, postedBy:'Admin' },
+  { id:1, title:'Tuesday Evening Class', type:'class', date:futureDateStr(3), time:'19:00', timeEnd:'21:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'Regular keiko. Beginners welcome. Please arrive 10 min early to prepare bogu.', docs:[], participants:['KT','RS','MA','YB','TN'], participantNames:['Kenji Tanaka','Robert Smith','Maria Anderson','Yuki Brown','Tom Nakamura'], registeredByMe:true, postedBy:'Admin' },
+  { id:2, title:'Spring Shiai — Regional Tournament', type:'tournament', date:futureDateStr(18), time:'09:00', timeEnd:'17:00', venue:'Prefectural Gymnasium, 2 Oak St', cost:'¥3,000 / member', regDeadline:futureDateStr(10), notes:'Individual and team shiai. Bring valid ZNKR membership card. Men and bogu mandatory.', docs:[{name:'Entry Form',url:'https://drive.google.com',type:'link'},{name:'Schedule',url:'',type:'file'}], participants:['KT','RS','MA'], participantNames:['Kenji Tanaka','Robert Smith','Maria Anderson'], registeredByMe:false, postedBy:'Admin' },
+  { id:3, title:'Seminar with Nakamura Sensei (7-dan)', type:'seminar', date:futureDateStr(26), time:'10:00', timeEnd:'15:00', venue:'East Community Hall, Room B', cost:'$40 per person', regDeadline:futureDateStr(20), notes:'Focus on kamae and suburi fundamentals. Open to all grades. Max 30 participants.', docs:[{name:'Seminar Flyer',url:'https://docs.google.com',type:'link'}], participants:['KT','YB','TN','MA','RS'], participantNames:['Kenji Tanaka','Yuki Brown','Tom Nakamura','Maria Anderson','Robert Smith'], registeredByMe:true, postedBy:'Trusted Member' },
+  { id:4, title:'Joint Practice — Riverside Dojo', type:'joint', date:futureDateStr(7), time:'14:00', timeEnd:'16:30', venue:'Riverside Kendo Club, 88 River Rd', cost:'Free', regDeadline:futureDateStr(5), notes:'Friendly joint keiko. Jigeiko format. Carpooling available — contact admin.', docs:[], participants:['KT','RS','TN'], participantNames:['Kenji Tanaka','Robert Smith','Tom Nakamura'], registeredByMe:false, postedBy:'Admin' },
+  { id:5, title:'Saturday Morning Class', type:'class', date:futureDateStr(5), time:'09:00', timeEnd:'11:00', venue:'Main Dojo — 45 Sakura Ave', cost:'Members Free', regDeadline:'', notes:'All levels. Focus on kihon waza this session.', docs:[], participants:['KT','MA','YB'], participantNames:['Kenji Tanaka','Maria Anderson','Yuki Brown'], registeredByMe:true, postedBy:'Admin' },
+  { id:6, title:'Grading Assessment (Ikkyu & Shodan)', type:'other', date:futureDateStr(35), time:'13:00', timeEnd:'16:00', venue:'Main Dojo — 45 Sakura Ave', cost:'$50 examination fee', regDeadline:futureDateStr(28), notes:'ZNKR grading for Ikkyu and Shodan candidates. Sensei approval required.', docs:[{name:'Grading Requirements',url:'https://drive.google.com',type:'link'},{name:'Application Form',url:'',type:'file'}], participants:['MA','TN'], participantNames:['Maria Anderson','Tom Nakamura'], registeredByMe:false, postedBy:'Admin' },
 ];
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
@@ -2102,6 +2175,10 @@ function renderCard(e) {
     return '<span class="doc-pill doc-pill-file" onclick="event.stopPropagation()">📎 '+d.name+'</span>';
   }).join('')+'</div>':'';
 
+  const viewAttendeesBtn = e.participants.length > 0 
+    ? '<button class="btn-ghost" style="font-size:11px;padding:5px 10px;margin-right:8px" onclick="event.stopPropagation();viewAttendees('+e.id+')">👥 View All</button>'
+    : '';
+
   const details = isList?`
     <div class="card-details">
       <div class="detail-row"><span class="detail-icon">📍</span><span class="detail-val">${e.venue||'—'}</span></div>
@@ -2125,7 +2202,7 @@ function renderCard(e) {
         ${details}
         <div class="card-footer" style="flex-shrink:0">
           <div class="participants-row" style="margin-right:8px"><div class="avatar-stack">${avatars}${extraChip}</div><span class="avatar-count">${e.participants.length}</span></div>
-          ${docPills}${editBtn}${regBtn}
+          ${docPills}${viewAttendeesBtn}${editBtn}${regBtn}
         </div>
       </div>
     </div>`;
@@ -2143,7 +2220,7 @@ function renderCard(e) {
         ${details}${docPills}
         <div class="card-footer">
           <div class="participants-row"><div class="avatar-stack">${avatars}${extraChip}</div><span class="avatar-count">${e.participants.length} going</span></div>
-          <div style="display:flex;gap:6px;align-items:center">${editBtn}${regBtn}</div>
+          <div style="display:flex;gap:6px;align-items:center">${viewAttendeesBtn}${editBtn}${regBtn}</div>
         </div>
       </div>
     </div>`;
@@ -2165,11 +2242,45 @@ function _doHighlight(id) {
 function toggleRegister(id) {
   const e = events.find(ev=>ev.id===id); if(!e) return;
   const myInit = currentUser ? initials(currentUser.name) : 'ME';
+  const myName = currentUser ? currentUser.name : 'Guest';
+  
   e.registeredByMe = !e.registeredByMe;
-  if(e.registeredByMe){ e.participants.push(myInit); showToast('✅ Registered for "'+e.title+'"'); }
-  else { e.participants=e.participants.filter(p=>p!==myInit); showToast('↩ Registration cancelled'); }
+  if(e.registeredByMe){ 
+    e.participants.push(myInit);
+    // Store full name for attendee list
+    if (!e.participantNames) e.participantNames = [];
+    e.participantNames.push(myName);
+    
+    showToast('✅ Registered for "'+e.title+'"');
+    
+    // Notify admin/trusted members
+    if (currentRole !== 'admin' && currentRole !== 'trusted') {
+      // In a real app, this would send a notification to admin
+      // For now, just log it (admin will see the updated count)
+      console.log('📢 New registration:', myName, 'registered for', e.title);
+    }
+  } else { 
+    e.participants=e.participants.filter(p=>p!==myInit);
+    if (e.participantNames) e.participantNames = e.participantNames.filter(n => n !== myName);
+    showToast('↩ Registration cancelled'); 
+  }
+  saveData(); // Save to localStorage
   if(currentView==='calendar') renderCalendar(); else renderEvents();
   renderUpcoming();
+}
+
+function viewAttendees(id) {
+  const e = events.find(ev => ev.id === id);
+  if (!e) return;
+  
+  const names = e.participantNames || [];
+  if (!names.length) {
+    alert('No one has registered yet.');
+    return;
+  }
+  
+  const list = names.map((name, i) => `${i+1}. ${name}`).join('\n');
+  alert(`Attendees for "${e.title}":\n\n${list}\n\nTotal: ${names.length}`);
 }
 
 // ─── DOC TAB SWITCH ───────────────────────────────────────────────────────
@@ -2367,9 +2478,11 @@ function saveEvent() {
   if(editingId){
     const idx=events.findIndex(e=>e.id===editingId);
     events[idx]={...events[idx],...data};
+    saveData(); // Save to localStorage
     showToast('✅ Event updated');
   } else {
     events.push({id:nextId(),participants:[],registeredByMe:false,...data});
+    saveData(); // Save to localStorage
     showToast('✅ Event added to the board');
   }
   closeModal();
