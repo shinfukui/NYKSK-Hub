@@ -1,5 +1,3 @@
-[kendo-dojo-hub (9).html](https://github.com/user-attachments/files/25398707/kendo-dojo-hub.9.html)
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
