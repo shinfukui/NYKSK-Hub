@@ -1,5 +1,3 @@
-[kendo-dojo-hub (10).html](https://github.com/user-attachments/files/25399029/kendo-dojo-hub.10.html)
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -156,13 +154,32 @@
   }
   .btn-primary:hover { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(192,57,43,0.4); }
 
-  /* MAIN LAYOUT */
+  /* MAIN */
   main {
     position: relative;
     z-index: 1;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 32px 24px 60px;
+  }
+
+  /* TWO-COLUMN LAYOUT */
+  .main-content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .main-content {
+    min-width: 0; /* Prevents grid blowout */
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
   }
 
   /* FILTERS & SEARCH */
@@ -1203,6 +1220,16 @@
     .event-card.list-mode { flex-direction: column; }
     .event-card.list-mode .card-stripe { width: 100%; height: 4px; }
     .event-card.list-mode .card-body { flex-direction: column; align-items: flex-start; }
+    
+    /* Stack layout on mobile */
+    .main-content-wrapper {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .sidebar {
+      position: static;
+      max-height: none;
+    }
   }
 
   /* ── CALENDAR VIEW ─────────────────────────────────────────────────────── */
@@ -1532,7 +1559,7 @@
 <!-- MAIN -->
 <main>
 
-  <!-- MEMBERS PANEL (admin only) -->
+  <!-- MEMBERS PANEL (admin only) - full width above everything -->
   <div class="members-panel" id="membersPanel" style="display:none">
     <div class="members-panel-header">
       <h3>🥋 Dojo Members</h3>
@@ -1544,22 +1571,11 @@
     <div class="members-list" id="membersList"></div>
   </div>
 
-  <!-- MESSAGE BOARD -->
-  <div class="message-board" id="messageBoard">
-    <div class="message-board-header">
-      <h3>💬 Message Board</h3>
-      <span style="font-size:11px;color:var(--gold);letter-spacing:0.08em" id="messageCount"></span>
-    </div>
-    <div class="message-form">
-      <textarea id="messageText" placeholder="Share a message, announcement, or question..."></textarea>
-      <div class="message-form-actions">
-        <input type="url" id="messageLink" placeholder="Paste a link (optional)">
-        <input type="url" id="messageImage" placeholder="Paste image URL (optional)">
-        <button class="btn-primary" onclick="postMessage()" style="padding:8px 16px;font-size:12px">Post</button>
-      </div>
-    </div>
-    <div class="messages-list" id="messagesList"></div>
-  </div>
+  <!-- TWO-COLUMN LAYOUT: Main content + Sidebar -->
+  <div class="main-content-wrapper">
+    
+    <!-- LEFT: Main content -->
+    <div class="main-content">
 
   <!-- UPCOMING STRIP -->
   <div class="upcoming-strip" id="upcomingStrip"></div>
@@ -1594,6 +1610,32 @@
 
   <!-- EVENTS CONTAINER -->
   <div id="eventsContainer"></div>
+
+    </div><!-- end main-content -->
+
+    <!-- RIGHT: Sidebar -->
+    <div class="sidebar">
+      
+      <!-- MESSAGE BOARD -->
+      <div class="message-board" id="messageBoard">
+        <div class="message-board-header">
+          <h3>💬 Message Board</h3>
+          <span style="font-size:11px;color:var(--gold);letter-spacing:0.08em" id="messageCount"></span>
+        </div>
+        <div class="message-form">
+          <textarea id="messageText" placeholder="Share a message, announcement, or question..."></textarea>
+          <div class="message-form-actions">
+            <input type="url" id="messageLink" placeholder="Paste a link (optional)">
+            <input type="url" id="messageImage" placeholder="Paste image URL (optional)">
+            <button class="btn-primary" onclick="postMessage()" style="padding:8px 16px;font-size:12px">Post</button>
+          </div>
+        </div>
+        <div class="messages-list" id="messagesList"></div>
+      </div>
+
+    </div><!-- end sidebar -->
+
+  </div><!-- end main-content-wrapper -->
 
 </main>
 
