@@ -2195,6 +2195,7 @@ function renderCard(e) {
   const extraChip = extra>0?'<div class="avatar" style="background:var(--gray)">+'+extra+'</div>':'';
   const canEdit = currentRole==='admin'||currentRole==='trusted';
   const editBtn = canEdit?'<button class="btn-ghost" style="font-size:11px;padding:5px 10px" onclick="event.stopPropagation();editEvent('+e.id+')">✎ Edit</button>':'';
+  const deleteBtn = canEdit?'<button class="btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--red);border-color:#fadbd8" onclick="event.stopPropagation();deleteEvent('+e.id+')" onmouseover="this.style.background=\'#fadbd8\'" onmouseout="this.style.background=\'transparent\'">🗑 Delete</button>':'';
   const regBtn  = '<button class="register-btn '+(e.registeredByMe?'registered':'')+'" onclick="event.stopPropagation();toggleRegister('+e.id+')">'+(e.registeredByMe?'✓ Registered':'Register')+'</button>';
 
   const docPills = e.docs.length?'<div class="doc-pills">'+e.docs.map(d=>{
@@ -2229,7 +2230,7 @@ function renderCard(e) {
         ${details}
         <div class="card-footer" style="flex-shrink:0">
           <div class="participants-row" style="margin-right:8px"><div class="avatar-stack">${avatars}${extraChip}</div><span class="avatar-count">${e.participants.length}</span></div>
-          ${docPills}${viewAttendeesBtn}${editBtn}${regBtn}
+          ${docPills}${viewAttendeesBtn}${editBtn}${deleteBtn}${regBtn}
         </div>
       </div>
     </div>`;
@@ -2247,7 +2248,7 @@ function renderCard(e) {
         ${details}${docPills}
         <div class="card-footer">
           <div class="participants-row"><div class="avatar-stack">${avatars}${extraChip}</div><span class="avatar-count">${e.participants.length} going</span></div>
-          <div style="display:flex;gap:6px;align-items:center">${viewAttendeesBtn}${editBtn}${regBtn}</div>
+          <div style="display:flex;gap:6px;align-items:center">${viewAttendeesBtn}${editBtn}${deleteBtn}${regBtn}</div>
         </div>
       </div>
     </div>`;
@@ -2518,6 +2519,17 @@ function saveEvent() {
   renderUpcoming();
 }
 
+function deleteEvent(id) {
+  if (!confirm('Delete this event? This cannot be undone.')) return;
+  
+  events = events.filter(e => e.id !== id);
+  saveData(); // Save to localStorage
+  
+  if(currentView==='calendar') renderCalendar(); else renderEvents();
+  renderUpcoming();
+  showToast('✅ Event deleted');
+}
+
 // ─── CALENDAR ─────────────────────────────────────────────────────────────
 let calYear,calMonth;
 (function(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();})();
@@ -2622,3 +2634,4 @@ document.getElementById('loginName').addEventListener('keydown',    e=>{if(e.key
 </script>
 </body>
 </html>
+do-dojo-hub (14).html…]()
