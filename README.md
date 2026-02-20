@@ -1765,7 +1765,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // GOOGLE SHEETS BACKEND — your data syncs between all users!
 // ═══════════════════════════════════════════════════════════════════════════
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxiJhKHZTPuj6HKozB4O8ZKhdjLM4Pa0PRIYTXSA6NBY_da1HMTh_gQQzroUaULlYGH/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzx7TiDGzrFp3KEMUQmtp1-raRV-xbUVooGeDDTQrPwBQf-wbeUkMkw13teymtPVBfR/exec';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PASSCODES — change these before sharing with your dojo!
